@@ -3,79 +3,28 @@ import "./App.css";
 import Button from "./components/Button";
 
 function App() {
-  const [result, setResult] = useState(0);
+  const [result, setResult] = useState("0");
+  const [refResult, setRefResult] = useState("0");
   const [operator, setOperator] = useState(null);
-  const inputRef = useRef(null);
-  const resultRef = useRef(null);
-
-  const handleAddNumber = (children) => {
-    let value = inputRef.current.value.split("");
-    if (value[0] === "0") {
-      value = value.slice(1);
-    }
-    const inputValue = [...value, children].join("");
-    if (children === ".") {
-      if (!value.includes(".")) {
-        inputRef.current.value = inputValue;
-      }
-    } else {
-      inputRef.current.value = inputValue;
-    }
-  };
-
-  const handleBackspace = () => {
-    let inputValue = [...inputRef.current.value].slice(0, -1);
-    inputRef.current.value = inputValue.join("");
-  };
-
-  const handleClearResult = () => {
-    inputRef.current.value = "0";
-    setResult(0);
-    setOperator(null);
-  };
-
-  const handleOperation = (o) => {
-    if (o === "=") {
-      switch (operator) {
-        case "/":
-          resultRef.current =
-            Number(resultRef.current) / Number(inputRef.current.value);
-          break;
-        case "x":
-          resultRef.current =
-            Number(resultRef.current) * Number(inputRef.current.value);
-          break;
-        case "-":
-          resultRef.current =
-            Number(resultRef.current) - Number(inputRef.current.value);
-          break;
-        case "+":
-          resultRef.current =
-            Number(resultRef.current) + Number(inputRef.current.value);
-          break;
-      }
-      inputRef.current.value = resultRef.current;
-      setResult(Number(resultRef.current));
-      setOperator(null);
-    } else {
-      resultRef.current = Number(inputRef.current.value);
-      inputRef.current.value = "0";
-
-      if (operator === o) {
-        handleOperation("=");
-      } else {
-        setOperator(o);
-      }
-    }
-  };
+  const [standby, setStandby] = useState(false);
 
   const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "."];
-  const handleInputNumber = (e) => {
-    e.preventDefault();
-    let value = inputRef.current.value.split("");
-    if (value[0] === "0" && value[1] !== ".") {
+  const handleAddNumber = (e, type) => {
+    let value;
+    if (type == "input") {
+      value = e.target.value.split("");
+    } else {
+      value = [...result.split(""), e];
+    }
+    if (standby) {
+      value = value.slice(-1);
+      setStandby(false);
+    }
+
+    if (value[0] === "0" && value.length > 1 && value[1] !== ".") {
       value = value.slice(1);
     }
+
     let formatedNumber = "";
     value.map((item) => {
       if (numbers.includes(item)) {
@@ -88,19 +37,75 @@ function App() {
         }
       }
     });
-    inputRef.current.value = formatedNumber;
+    if (formatedNumber === "") {
+      formatedNumber = "0";
+    }
+    setResult(formatedNumber);
+  };
+
+  const handleBackspace = () => {
+    if (result.length < 2) {
+      setResult("0");
+    } else {
+      setResult([...result].slice(0, -1).join(""));
+    }
+  };
+
+  const handleClearResult = () => {
+    setResult("0");
+    setRefResult("0");
+    setOperator(null);
+  };
+
+  const doOperation = (o) => {
+    let operationResult;
+    switch (o) {
+      case "+":
+        operationResult = Number(result) + Number(refResult);
+        break;
+      case "-":
+        operationResult = Number(refResult) - Number(result);
+        break;
+      case "x":
+        operationResult = Number(refResult) * Number(result);
+        break;
+      case "/":
+        operationResult = Number(refResult) / Number(result);
+        break;
+    }
+
+    setResult(String(operationResult));
+    setRefResult(String(operationResult));
+  };
+
+  const handleOperation = (o) => {
+    setRefResult(result);
+    if (o == "=") {
+      doOperation(operator);
+      setOperator(null);
+    } else {
+      setOperator(o);
+      setStandby(true);
+      if (operator !== null) {
+        if (operator === o) {
+          doOperation(o);
+        } else {
+          doOperation(operator);
+        }
+      }
+    }
   };
 
   return (
     <div className="App">
       <form className="form">
-        <span className="result">{resultRef.current}</span>
         <input
           type="text"
           className="input"
-          ref={inputRef}
-          defaultValue={0}
-          onChange={handleInputNumber}
+          value={result}
+          onChange={(e) => {
+            handleAddNumber(e, "input");
+          }}
         />
 
         <div className="calc">
