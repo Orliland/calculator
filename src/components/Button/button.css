@@ -1,0 +1,50 @@
+.btn {
+  cursor: pointer;
+  position: relative;
+  width: 8rem;
+  height: 8rem;
+  padding: 0;
+  border: none;
+  border-radius: 2.6rem;
+
+  background: #e0e0e0;
+  color: #ffffff;
+
+  font-size: 2.2rem;
+  font-weight: bold;
+
+  box-shadow: 8px 8px 16px #bebebe, -8px -8px 16px #ffffff;
+  transition: all 0.3s ease;
+}
+
+.btn--primary {
+  background: #e2842b;
+}
+
+.btn--secondary {
+  background: #7c7c7c;
+}
+
+.btn--active {
+  box-shadow: inset 8px 8px 16px #bebebe, inset -8px -8px 16px #ffffff;
+}
+
+.btn--primary.btn--active {
+  box-shadow: inset 8px 8px 16px #c07025, inset -8px -8px 16px #ff9831;
+}
+
+.btn--secondary.btn--active {
+  box-shadow: inset 8px 8px 16px #696969, inset -8px -8px 16px #8f8f8f;
+}
+
+.btn.row2 {
+  height: 100%;
+  grid-column: 4/5;
+  grid-row: 4/6;
+}
+
+.btn.col2 {
+  width: 100%;
+  grid-row: 5/6;
+  grid-column: 1/3;
+}
